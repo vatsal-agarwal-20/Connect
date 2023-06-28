@@ -2,7 +2,8 @@ import React from 'react';
 import Menu from './Menu';
 import Sidebar from './sidebar/Sidebar';
 import Login from './Login';
-import Register from './Register';
+import Main from '../components/main/Main';
+import Register from './register';
 
  
 const Home = () => {
@@ -14,11 +15,8 @@ const Home = () => {
 
         <div className="col-md-4">
           <Sidebar/>
-          <Menu/>
-          <div style={{display: "flex", justifyContent: "center"}}>
-            <Register/>
-            <Login/>
-          </div>
+          <Main/>
+          
         </div>
       </div>
     );
