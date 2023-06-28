@@ -2,7 +2,7 @@ import React from "react";
 import logo from "../images/logo.png"
 
 const applogo={
-  height:"3em",
+  height:"5em",
   width:"5em",
   mixBlendMode:"multiply"
 }

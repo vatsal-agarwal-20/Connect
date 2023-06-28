@@ -97,6 +97,10 @@
     left: 0 !important;
     position: absolute;
   }
+  a{
+    text-decoration: none;
+    color: white;
+  }
   
   @media only screen and (max-width: 978px) {
     #sidebar {
