@@ -9,7 +9,7 @@ const Main = () => {
 
         <div className="main__title">
           <div className="main__greeting">
-            <h1>Hello </h1>
+            <h1>Hello User,</h1>
             <p>Welcome to your Admin Dashboard</p>
           </div>
         </div>
