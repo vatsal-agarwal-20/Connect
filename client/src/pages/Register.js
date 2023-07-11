@@ -1,17 +1,47 @@
-import React from 'react';
+import React, { useState, useEffect} from 'react';
+import { useDispatch, useSelector } from "react-redux";
+import { useHistory, Link } from "react-router-dom";
+import { register } from '../redux/actions/authAction';
 import logo from "../images/logo.png"
 
 const applogo={
-  height:"5em",
+  height:"3em",
   width:"5em",
   mixBlendMode:"multiply"
 }
 const Register = () => {
+    const {auth, alert} = useSelector(state => state);
+    const dispatch = useDispatch();
+    const history = useHistory();
 
+     const initialState = { fullname: "", username: "", email: "", password: "", cf_password: "", gender: "male" };
+     const [userData, setUserData] = useState(initialState);
+     const { fullname, username, email, password, cf_password } = userData;
+
+     const [typePass, setTypePass] = useState(false);
+     const [typeCfPass, setTypeCfPass] = useState(false);
+
+    useEffect(() => {
+      if (auth.token) history.push("/");
+    }, [auth.token, history]);
+
+   
+
+    
+
+    const handleChangeInput = (e) => {
+      const { name, value } = e.target;
+      setUserData({ ...userData, [name]: value });
+    };
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      dispatch(register(userData));
+    };
 
     return (
-      <div className="auth_page" style={{padding: "0 50px"}}>
-        <form  className="inner-shadow">
+      <div className="auth_page">
+        <form onSubmit={handleSubmit} className="inner-shadow">
           <h3 className="text-uppercase text-center mb-4 auth-heading">
           <img src={logo} alt="" style={applogo}/>
           </h3>
@@ -24,6 +54,8 @@ const Register = () => {
                 type="text"
                 className="form-control"
                 id="fullname"
+                onChange={handleChangeInput}
+                value={fullname}
                 name="fullname"
                 style={{ background: `${alert.fullname ? "#fd2d6a14" : ""} ` }}
               />
@@ -42,6 +74,8 @@ const Register = () => {
                 type="text"
                 className="form-control"
                 id="username"
+                onChange={handleChangeInput}
+                value={username.toLowerCase().replace(/ /g, "")}
                 name="username"
                 style={{ background: `${alert.username ? "#fd2d6a14" : ""} ` }}
               />
@@ -61,6 +95,8 @@ const Register = () => {
                 className="form-control"
                 id="email"
                 aria-describedby="emailHelp"
+                onChange={handleChangeInput}
+                value={email}
                 name="email"
                 style={{ background: `${alert.email ? "#fd2d6a14" : ""} ` }}
               />
@@ -77,14 +113,18 @@ const Register = () => {
             <div className="pass">
               <div className="outer-shadow hover-in-shadow form-input-wrap">
                 <input
+                  type={typePass ? "text" : "password"}
                   className="form-control"
                   id="password"
+                  onChange={handleChangeInput}
+                  value={password}
                   name="password"
                   style={{
                     background: `${alert.password ? "#fd2d6a14" : ""} `,
                   }}
                 />
-                <small >
+                <small onClick={() => setTypePass(!typePass)}>
+                  {typePass ? "Hide" : "Show"}
                 </small>
               </div>
             </div>
@@ -100,14 +140,18 @@ const Register = () => {
             <div className="pass">
               <div className="outer-shadow hover-in-shadow form-input-wrap">
                 <input
+                  type={typeCfPass ? "text" : "password"}
                   className="form-control"
                   id="cf_password"
+                  onChange={handleChangeInput}
+                  value={cf_password}
                   name="cf_password"
                   style={{
                     background: `${alert.cf_password ? "#fd2d6a14" : ""} `,
                   }}
                 />
-                <small>
+                <small onClick={() => setTypeCfPass(!typeCfPass)}>
+                  {typeCfPass ? "Hide" : "Show"}
                 </small>
               </div>
             </div>
@@ -125,6 +169,7 @@ const Register = () => {
                 name="gender"
                 value="male"
                 defaultChecked
+                onChange={handleChangeInput}
               />
             </label>
 
@@ -135,6 +180,7 @@ const Register = () => {
                 id="female"
                 name="gender"
                 value="female"
+                onChange={handleChangeInput}
               />
             </label>
           </div>
@@ -147,9 +193,9 @@ const Register = () => {
           </button>
           <p className="my-2">
             Already have an account?{" "}
-            <div style={{ color: "crimson" }}>
+            <Link to="/" style={{ color: "crimson" }}>
               Login Now.
-            </div>
+            </Link>
           </p>
         </form>
       </div>

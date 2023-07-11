@@ -1,16 +1,48 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useHistory } from "react-router-dom";
+import { adminLogin, login } from "../redux/actions/authAction";
+import { useDispatch, useSelector } from "react-redux";
 import logo from "../images/logo.png"
 
 const applogo={
-  height:"5em",
+  height:"3em",
   width:"5em",
   mixBlendMode:"multiply"
 }
 const Login = () => {
+  const initialState = { email: "", password: "" };
+  const [userData, setUserData] = useState(initialState);
+  const [userType, setUserType] = useState(false);
+  const { email, password } = userData;
+
+  const [typePass, setTypePass] = useState(false);
+
+  const { auth } = useSelector((state) => state);
+
+  const dispatch = useDispatch();
+  const history = useHistory();
+
+  useEffect(() => {
+    if (auth.token) history.push("/");
+  }, [auth.token, history]);
+
+  const handleChangeInput = (e) => {
+    const { name, value } = e.target;
+    setUserData({ ...userData, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!userType) {
+      dispatch(login(userData));
+    } else {
+      dispatch(adminLogin(userData));
+    }
+  };
 
   return (
     <div className="auth_page">
-      <form className="inner-shadow">
+      <form onSubmit={handleSubmit} className="inner-shadow">
         <h3 className="text-uppercase text-center mb-4 auth-heading ">
         <img src={logo} alt="" style={applogo}/>
         </h3>
@@ -24,6 +56,8 @@ const Login = () => {
               className="form-control "
               id="exampleInputEmail1"
               aria-describedby="emailHelp"
+              onChange={handleChangeInput}
+              value={email}
               name="email"
             />
           </div>
@@ -38,10 +72,16 @@ const Login = () => {
           <div className="pass">
             <div className="outer-shadow hover-in-shadow form-input-wrap">
               <input
+                type={typePass ? "text" : "password"}
                 className="form-control"
                 id="exampleInputPassword1"
+                onChange={handleChangeInput}
+                value={password}
                 name="password"
               />
+              <small onClick={() => setTypePass(!typePass)}>
+                {typePass ? "Hide" : "Show"}
+              </small>
             </div>
           </div>
         </div>
@@ -53,7 +93,9 @@ const Login = () => {
               type="radio"
               id="User"
               name="gender"
+              value={userType}
               defaultChecked
+              onClick={() => setUserType(false)}
             />
           </label>
 
@@ -63,6 +105,8 @@ const Login = () => {
               type="radio"
               id="Admin"
               name="gender"
+              value={userType}
+              onClick={() => setUserType(true)}
             />
           </label>
         </div>
@@ -70,14 +114,15 @@ const Login = () => {
         <button
           type="submit"
           className="btn-1 w-100 d-flex outer-shadow hover-in-shadow justify-content-center"
+          disabled={email && password ? false : true}
         >
           Login
         </button>
         <p className="my-2">
           Don't have an account?{" "}
-          <div style={{ color: "crimson" }}>
+          <Link to="/register" style={{ color: "crimson" }}>
             Register Now.
-          </div>
+          </Link>
         </p>
       </form>
     </div>
