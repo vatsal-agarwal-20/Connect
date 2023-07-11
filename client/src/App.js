@@ -1,96 +1,68 @@
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import "@mui/material";
+import "react-icons";
+import "react-icons/bi";
+import "react-icons/md";
+import "react-icons/bs";
+import "react-router-dom";
+import { CssBaseline } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
+import theme from "./theme";
+
+import PostView from "./components/views/PostView";
+import CreatePostView from "./components/views/CreatePostView";
+import ProfileView from "./components/views/ProfileView";
+import LoginView from "./components/views/LoginView";
+import SignupView from "./components/views/SignupView";
+import ExploreView from "./components/views/ExploreView";
+import PrivateRoute from "./components/PrivateRoute";
+import SearchView from "./components/views/SearchView";
+import MessengerView from "./components/views/MessengerView";
+import { initiateSocketConnection, socket } from "./helpers/socketHelper";
 import { useEffect } from "react";
-import io from 'socket.io-client'
-
-import PageRender from "./customRouter/PageRender";
-import PrivateRouter from "./customRouter/PrivateRouter";
-import Login from "./pages/login";
-import Register from "./pages/register";
-import Home from "./pages/home";
-import Alert from "./components/alert/Alert";
-import Header from "./components/header/Header";
-import StatusModal from "./components/StatusModal";
-import { refreshToken } from "./redux/actions/authAction";
-import { getPosts } from "./redux/actions/postAction";
-import { getSuggestions } from "./redux/actions/suggestionsAction";
-import { getNotifies } from "./redux/actions/notifyAction";
-
-import AdminDashboard from "./pages/adminDashboard";
-import { GLOBALTYPES } from "./redux/actions/globalTypes";
-import SocketClient from "./SocketClient";
+import { BASE_URL } from "./config";
+import { io } from "socket.io-client";
 
 function App() {
-  const { auth, status, modal, userType } = useSelector((state) => state);
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(refreshToken());
-
-    const socket = io();
-    dispatch({type: GLOBALTYPES.SOCKET, payload: socket })
-    return () => socket.close()
-  }, [dispatch]);
-
-
-  useEffect(() => {
-    if (auth.token) {
-      dispatch(getPosts(auth.token));
-      dispatch(getSuggestions(auth.token));
-      dispatch(getNotifies(auth.token));
-    }
-  }, [dispatch, auth.token]);
-
-  useEffect(() => {
-    if (!("Notification" in window)) {
-      alert("This browser does not support desktop notification");
-    } else if (Notification.permission === "granted") {
-
-    } else if (Notification.permission !== "denied") {
-      Notification.requestPermission().then(function (permission) {
-        if (permission === "granted") {
-        }
-      });
-    }
-  }, [])
-
-   
+  initiateSocketConnection();
 
   return (
-    <Router>
-      <Alert />
-      <input type="checkbox" id="theme" />
-      <div className={`App ${(status || modal) && "mode"}`}>
-        <div className="main">
-          {userType === "user" && auth.token && <Header />}
-          {status && <StatusModal />}
-          {auth.token && <SocketClient /> }
+    <ThemeProvider theme={theme}>
+      <BrowserRouter>
+        <CssBaseline />
+        <Routes>
+          <Route path="/" element={<ExploreView />} />
+          <Route path="/posts/:id" element={<PostView />} />
           <Route
-            exact
-            path="/"
-            component={
-              userType === "user"
-                ? auth.token
-                  ? Home
-                  : Login
-                : auth.token
-                ? AdminDashboard
-                : Login
+            path="/posts/create"
+            element={
+              <PrivateRoute>
+                <CreatePostView />
+              </PrivateRoute>
             }
           />
-
-          {userType === "user" && (
-            <>
-              <Route exact path="/register" component={Register} />
-              <div className="wrap_page">
-                <PrivateRouter exact path="/:page" component={PageRender} />
-                <PrivateRouter exact path="/:page/:id" component={PageRender} />
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </Router>
+          <Route
+            path="/messenger"
+            element={
+              <PrivateRoute>
+                <MessengerView />
+              </PrivateRoute>
+            }
+          />
+          <Route path="/search" element={<SearchView />} />
+          <Route path="/users/:id" element={<ProfileView />} />
+          <Route path="/login" element={<LoginView />} />
+          <Route path="/signup" element={<SignupView />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

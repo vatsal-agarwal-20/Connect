@@ -1,18 +1,6 @@
-import React from 'react';
-import './App.css'
-import ReactDOM from 'react-dom';
-import './styles/global.css';
-import App from './App';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
 
-import DataProvider from './redux/store';
-
-ReactDOM.render(
-  <React.StrictMode>
-    <DataProvider>
-      <App />
-    </DataProvider>
-  </React.StrictMode>,
-  document.getElementById("root")
-);
-
-
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App />);
